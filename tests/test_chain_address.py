@@ -1,5 +1,5 @@
 import unittest
-from app.utils import checkPubKeyAddress
+from app.blockchain.utils import checkPubKeyAddress
 
 class TestAddressValidation(unittest.TestCase):
     
