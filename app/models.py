@@ -1,3 +1,10 @@
+"""
+Helsinki-NLP/opus-mt-fr-en : Modèle pour traduire du français vers l'anglais 
+We will use the Helsinki-NLP/opus-mt-fr-en model to translate a French text to English.
+
+Currently working on the translation function that dynamically loads the necessary model.
+"""
+
 from transformers import MarianMTModel, MarianTokenizer
 import torch
 import sentencepiece
