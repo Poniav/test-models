@@ -2,7 +2,7 @@
 DeepSeekR1: A deep learning-based tool for fast and accurate prediction of DNA and RNA binding proteins
 https://huggingface.co/deepseek-ai/DeepSeek-R1
 
-Code test from the model page
+Not working yet on Local & Google Colab - To be implemented 
 """
 from transformers import AutoModelForCausalLM
 

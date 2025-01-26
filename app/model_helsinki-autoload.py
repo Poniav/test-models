@@ -7,25 +7,24 @@ Currently working on the translation function that dynamically loads the necessa
 
 from transformers import MarianMTModel, MarianTokenizer
 import torch
-import sentencepiece
 
-# Fonction de traduction qui charge dynamiquement le modèle nécessaire
+# Function to translate text from source language to target language
 def translate_text(text, src_lang, tgt_lang):
-    # Définir le nom du modèle en fonction de la paire de langues
+    # Define the model name based on the source and target languages
     model_name = f'Helsinki-NLP/opus-mt-{src_lang}-{tgt_lang}'
     
-    # Charger le modèle et le tokenizer
+    # Load the model and tokenizer
     model = MarianMTModel.from_pretrained(model_name)
     tokenizer = MarianTokenizer.from_pretrained(model_name)
     
-    # Tokeniser le texte source
+    # Tokenize the input text
     inputs = tokenizer(text, return_tensors="pt", padding=True, truncation=True)
     
-    # Effectuer la traduction
+    # Generate translation
     with torch.no_grad():
         translated = model.generate(**inputs)
     
-    # Décoder la réponse
+    # Decode the translated text
     translated_text = tokenizer.decode(translated[0], skip_special_tokens=True)
 
     res = {
@@ -38,7 +37,7 @@ def translate_text(text, src_lang, tgt_lang):
     
     return res
 
-# Exemple d'utilisation
+# Usage example
 text = "Je suis aller à la neige hier soir et je suis très content de ce que j'ai fait."
 src_lang = "fr"  # Langue source (français)
 tgt_lang = "en"  # Langue cible (anglais)

@@ -1,11 +1,14 @@
 from diffusers import StableDiffusionControlNetImg2ImgPipeline, ControlNetModel
-import os
 import torch
+from config import Config
 
-# Charger le modèle ControlNet
+# Load the configuration
+app = Config()
+
+# Load the ControlNet model
 controlnet = ControlNetModel.from_pretrained("lllyasviel/control_v11p_sd15_canny")
 
-# Charger le pipeline avec ControlNet
+# Load the Stable Diffusion pipeline
 pipe = StableDiffusionControlNetImg2ImgPipeline.from_pretrained(
     "runwayml/stable-diffusion-v1-5",
     controlnet=controlnet,
@@ -13,19 +16,19 @@ pipe = StableDiffusionControlNetImg2ImgPipeline.from_pretrained(
 )
 pipe = pipe.to("cuda")
 
-# Utiliser ControlNet pour capturer les contours de l'image de départ
+# Load the input image
 from PIL import Image
 import numpy as np
 import cv2
 
-path = os.path.abspath("resources/aurore.png")
+path = app.RESOURCES_PATH + "/marlin.jpeg"
 print(path)
 input_image = Image.open(path).convert("RGB")
 input_array = np.array(input_image)
-edges = cv2.Canny(input_array, 100, 200)  # Détecter les contours
+edges = cv2.Canny(input_array, 100, 200)  # Apply Canny edge detection
 control_image = Image.fromarray(edges).convert("RGB")
 
-# Générer une image fidèle aux contours
+# Generate the result
 results = pipe(
     prompt="A beautiful portrait with similar style",
     image=input_image,
@@ -34,5 +37,6 @@ results = pipe(
     guidance_scale=7.5
 ).images
 
-# Sauvegarder l'image
-results[0].save("result_fidele.png")
+# Save the result
+img_path = app.RESULTS_PATH + "/result_fidele.png"
+results[0].save(img_path)

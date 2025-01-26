@@ -17,3 +17,6 @@ class Config:
 
     # Path to the resources folder
     RESOURCES_PATH = os.path.abspath("resources")
+
+    # Path to the results folder
+    RESULTS_PATH = os.path.abspath("results")
