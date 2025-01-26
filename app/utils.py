@@ -17,6 +17,7 @@ chainList = [
         "decoder": base58.b58decode
     }
 ]
+
 def checkPubKeyAddress(address):
     for chain in chainList:
         if chain["pattern"]:
