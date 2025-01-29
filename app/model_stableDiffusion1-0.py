@@ -8,38 +8,51 @@ pip install diffusers[torch] transformers accelerate xformers
 
 
 """
-from diffusers import StableDiffusionXLImg2ImgPipeline, StableDiffusionXLInpaintPipeline
+from diffusers import StableDiffusionXLPipeline, StableDiffusionXLImg2ImgPipeline
 import torch
 from PIL import Image
 
-# Load the base SDXL model
-base_pipe = StableDiffusionXLImg2ImgPipeline.from_pretrained(
+# Check if CUDA is available
+device = "cuda" if torch.cuda.is_available() else "cpu"
+
+# Load the base model (Text-to-Image)
+base_pipe = StableDiffusionXLPipeline.from_pretrained(
     "stabilityai/stable-diffusion-xl-base-1.0", torch_dtype=torch.float16
-).to("cuda")
+).to(device)
 
-# Load the refiner SDXL model
-refiner_pipe = StableDiffusionXLInpaintPipeline.from_pretrained(
+# Load the refiner model (Image-to-Image)
+refiner_pipe = StableDiffusionXLImg2ImgPipeline.from_pretrained(
     "stabilityai/stable-diffusion-xl-refiner-1.0", torch_dtype=torch.float16
-).to("cuda")
+).to(device)
 
-# Parameters for the generation
+# Parameters for generation
 prompt = "A futuristic cityscape at sunset, ultra-realistic, vibrant colors"
 negative_prompt = "low quality, blurry, unrealistic"
-guidance_scale = 7.5  # Poids pour la guidance
-num_inference_steps = 50  # Nombre d'étapes d'inférence
+guidance_scale = 7.5
+num_inference_steps = 50
 
-# Generate the base image
-base_image = base_pipe(prompt=prompt, negative_prompt=negative_prompt, guidance_scale=guidance_scale,
-                       num_inference_steps=num_inference_steps).images[0]
+# Generate the base image (Text-to-Image)
+base_image = base_pipe(
+    prompt=prompt,
+    negative_prompt=negative_prompt,
+    guidance_scale=guidance_scale,
+    num_inference_steps=num_inference_steps
+).images[0]
 
 # Save the base image
 base_image.save("output_base_image.png")
 
-# Use the refiner to refine the base image
-refined_image = refiner_pipe(image=base_image, prompt=prompt, negative_prompt=negative_prompt,
-                             guidance_scale=guidance_scale).images[0]
+# Refine the generated image by reintroducing it as input (Image-to-Image)
+refined_image = refiner_pipe(
+    prompt=prompt,
+    negative_prompt=negative_prompt,
+    guidance_scale=guidance_scale,
+    num_inference_steps=30,
+    image=base_image,
+    strength=0.5
+).images[0]
 
 # Save the refined image
 refined_image.save("output_refined_image.png")
 
-print("Images générées et enregistrées : 'output_base_image.png' et 'output_refined_image.png'")
+print("Images generated and saved: 'output_base_image.png' and 'output_refined_image.png'")
